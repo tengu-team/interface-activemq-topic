@@ -36,8 +36,9 @@ class ActiveMQRequires(RelationBase):
         conv.remove_state('{relation_name}.available')
 
     def connection(self):
-        for conv in self.conversations():
-            yield {'host': conv.get_remote('host'),
-                   'port': conv.get_remote('port'),
-                   'topic' : conv.get_remote('topic'),
-                   'name' : conv.get_remote('name')}
+        conv = self.conversation()
+        data = {'host': conv.get_remote('host'),
+                'port': conv.get_remote('port'),
+                'topic' : conv.get_remote('topic'),
+                'name' : conv.get_remote('name')}
+        return(data)

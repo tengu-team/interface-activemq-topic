@@ -25,22 +25,21 @@ class ActiveMQProvides(RelationBase):
 
     @hook('{provides:activemq-topic}-relation-{joined,changed}')
     def changed(self):
-        self.set_state('{relation_name}.available')
+        conv = self.conversation()
+        conv.set_state('{relation_name}.available')
 
     @hook('{provides:activemq-topic}-relation-{broken,departed}')
     def broken(self):
-        self.remove_state('{relation_name}.available')
+        conv = self.conversation()
+        conv.remove_state('{relation_name}.available')
 
-    def configure(self, topic, name, port, private_address=None, hostname=None):
+    def configure(self, topic, name, port, hostname=None):
         if not hostname:
             hostname = hookenv.unit_get('private-address')
-        if not private_address:
-            private_address = hookenv.unit_get('private-address')
         relation_info = {
-            'hostname': hostname,
-            'private-address': private_address,
+            'host': hostname,
             'port': port,
             'topic': topic,
-            'name' : name
-        }
-        self.set_remote(**relation_info)
+            'name' : name}
+        for conv in self.conversations():
+            conv.set_remote(**relation_info)
